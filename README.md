@@ -82,6 +82,24 @@ GOGUFW focuses on adding a lightweight off-grid FSK messaging system while prese
 - Delayed retry scheduler
 - Improved reliability in multi-radio environments
 
+# Screenshots
+
+## Messenger Home
+
+![Messenger Home](uv-k5-screenshot (17).png)
+
+## Compose Screen
+
+![Compose](uv-k5-screenshot (19).png)
+
+## Inbox
+
+![Inbox](uv-k5-screenshot (18).png)
+
+## Sent
+
+![Inbox](uv-k5-screenshot (20).png)
+
 ---
 
 # Planned Features
