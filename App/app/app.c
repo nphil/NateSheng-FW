@@ -39,6 +39,10 @@
 #include "app/generic.h"
 #include "app/main.h"
 #include "app/menu.h"
+#ifdef ENABLE_MESSENGER
+    #include "app/messenger.h"
+    #include "app/messenger_rf.h"
+#endif
 #include "app/scanner.h"
 #if defined(ENABLE_UART) || defined(ENABLE_USB)
     #include "app/uart.h"
@@ -100,6 +104,10 @@ void (*ProcessKeysFunctions[])(KEY_Code_t Key, bool bKeyPressed, bool bKeyHeld) 
 
 #ifdef ENABLE_AIRCOPY
     [DISPLAY_AIRCOPY] = &AIRCOPY_ProcessKeys,
+#endif
+
+#ifdef ENABLE_MESSENGER
+    [DISPLAY_MESSENGER] = &MSG_ProcessKeys,
 #endif
 };
 
@@ -684,6 +692,10 @@ static void CheckRadioInterrupts(void)
         } interrupts;
 
         interrupts.__raw = BK4819_ReadRegister(BK4819_REG_02);
+
+#ifdef ENABLE_MESSENGER
+        MSG_RF_OnRadioInterrupt(interrupts.__raw);
+#endif
 
         // 0 = no phase shift
         // 1 = 120deg phase shift
@@ -1396,6 +1408,9 @@ void APP_TimeSlice10ms(void)
 
     if (gCurrentFunction != FUNCTION_POWER_SAVE || !gRxIdleMode)
         CheckRadioInterrupts();
+#ifdef ENABLE_MESSENGER
+        MSG_RF_Tick10ms();
+#endif
 
     if (gCurrentFunction == FUNCTION_TRANSMIT)
     {   // transmitting

@@ -25,6 +25,9 @@
 #endif
 #include "app/generic.h"
 #include "app/main.h"
+#ifdef ENABLE_MESSENGER
+    #include "app/messenger.h"
+#endif
 #include "app/scanner.h"
 
 #ifdef ENABLE_SPECTRUM
@@ -745,6 +748,15 @@ static void MAIN_Key_EXIT(bool bKeyPressed, bool bKeyHeld)
 
 static void MAIN_Key_MENU(bool bKeyPressed, bool bKeyHeld)
 {
+#ifdef ENABLE_MESSENGER
+    if (!bKeyHeld && !bKeyPressed && gWasFKeyPressed) {
+        gWasFKeyPressed = false;
+        MSG_Open();
+        gBeepToPlay = BEEP_1KHZ_60MS_OPTIONAL;
+        return;
+    }
+#endif
+
     if (bKeyPressed && !bKeyHeld) // menu key pressed
         gBeepToPlay = BEEP_1KHZ_60MS_OPTIONAL;
 

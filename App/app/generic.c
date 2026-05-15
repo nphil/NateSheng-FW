@@ -25,6 +25,9 @@
 #endif
 
 #include "app/generic.h"
+#ifdef ENABLE_MESSENGER
+#include "app/messenger_rf.h"
+#endif
 #include "app/menu.h"
 #include "app/scanner.h"
 #include "audio.h"
@@ -188,6 +191,9 @@ void GENERIC_Key_PTT(bool bKeyPressed)
     DTMF_clear_input_box();
 
 start_tx:
+#ifdef ENABLE_MESSENGER
+    MSG_RF_HardRestoreVoicePath();
+#endif
     // request start TX
     gFlagPrepareTX = true;
     goto done;

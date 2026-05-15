@@ -32,6 +32,9 @@
 #include "../helper/battery.h"
 #include "../misc.h"
 #include "../settings.h"
+#ifdef ENABLE_MESSENGER
+    #include "app/messenger_store.h"
+#endif
 
 #ifdef ENABLE_FEAT_F4HWN
     #include "../version.h"
@@ -172,8 +175,22 @@ const t_menu_item MenuList[] =
     {"SetScn",      MENU_SET_SCN       },
 #endif
 #endif
+#ifdef ENABLE_MESSENGER
+    {"MsgRx",       MENU_MSG_RX       },
+    {"MsgCsg",      MENU_MSG_CSG      },
+    {"MsgCtx",      MENU_MSG_CALLTX   },
+    {"MsgAck",      MENU_MSG_ACK      },
+#ifdef ENABLE_EXPERIMENTAL_HOP
+    {"MsgHop",      MENU_MSG_HOP      },
+#endif
+    {"MsgBep",      MENU_MSG_BEEP     },
+    {"MsgLed",      MENU_MSG_LED      },
+#endif
     // hidden menu items from here on
     // enabled if pressing both the PTT and upper side button at power-on
+#ifdef ENABLE_MESSENGER
+    {"MsgDbg",      MENU_MSG_DEBUG    },
+#endif
     {"F Lock",      MENU_F_LOCK        },
 #ifndef ENABLE_FEAT_F4HWN
     {"Tx 200",      MENU_200TX         }, // was "200TX"
@@ -195,7 +212,11 @@ const t_menu_item MenuList[] =
     {"",                              0xff               }  // end of list - DO NOT delete or move this this
 };
 
+#ifdef ENABLE_MESSENGER
+const uint8_t FIRST_HIDDEN_MENU_ITEM = MENU_MSG_DEBUG;
+#else
 const uint8_t FIRST_HIDDEN_MENU_ITEM = MENU_F_LOCK;
+#endif
 
 const char gSubMenu_TXP[][6] =
 {
@@ -891,6 +912,14 @@ void UI_DisplayMenu(void)
             strcpy(String, gSubMenu_RX_TX[gSubMenuSelection]);
             break;
 
+        #ifdef ENABLE_MESSENGER
+        case MENU_MSG_CSG:
+            MSG_STORE_Init();
+            strncpy(String, gMessengerConfig.callsign, 7);
+            String[6] = 0;
+            break;
+        #endif
+
         #ifndef ENABLE_FEAT_F4HWN
             #ifdef ENABLE_AM_FIX
                 case MENU_AM_FIX:
@@ -920,8 +949,27 @@ void UI_DisplayMenu(void)
         case MENU_SET_TMR:
         case MENU_S_PRI:
 #endif
+#ifdef ENABLE_MESSENGER
+        case MENU_MSG_RX:
+        case MENU_MSG_CALLTX:
+        case MENU_MSG_ACK:
+        case MENU_MSG_BEEP:
+        case MENU_MSG_DEBUG:
+#endif
             strcpy(String, gSubMenu_OFF_ON[gSubMenuSelection]);
             break;
+
+        #ifdef ENABLE_MESSENGER
+        case MENU_MSG_HOP:
+            if (gSubMenuSelection == 0) strcpy(String, "OFF");
+            else sprintf(String, "%u", gSubMenuSelection);
+            break;
+        case MENU_MSG_LED:
+            if (gSubMenuSelection == 0) strcpy(String, "OFF");
+            else if (gSubMenuSelection == 1) strcpy(String, "GREEN");
+            else strcpy(String, "YELLOW");
+            break;
+#endif
 
         case MENU_MEM_CH:
         case MENU_1_CALL:

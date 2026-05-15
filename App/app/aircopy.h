@@ -94,7 +94,7 @@ extern uint16_t        gAirCopyBlockNumber;
 extern uint16_t        gErrorsDuringAirCopy;
 extern bool            gAirCopyIsSendMode;
 
-extern uint16_t        g_FSK_Buffer[36];
+extern uint16_t        g_FSK_Buffer[50];
 
 // ============================================================================
 // API

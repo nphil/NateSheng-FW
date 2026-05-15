@@ -17,6 +17,9 @@
 #include <string.h>
 
 #include "app/chFrScanner.h"
+#ifdef ENABLE_MESSENGER
+    #include "app/messenger.h"
+#endif
 #ifdef ENABLE_FMRADIO
     #include "app/fm.h"
 #endif
@@ -52,6 +55,15 @@ static void convertTime(uint8_t *line, uint8_t type)
     gUpdateStatus = true;
 }
 #endif
+#endif
+
+#ifdef ENABLE_MESSENGER
+// 10x8 envelope outline used in the original GGFW Messenger experiments.
+// It is drawn in the former CL/OP/PTT-session indicator area, while MO/DWR
+// remains untouched.
+static const uint8_t BITMAP_MSG_ENVELOPE[10] = {
+    0x7E, 0x42, 0x46, 0x4A, 0x52, 0x52, 0x4A, 0x46, 0x42, 0x7E
+};
 #endif
 
 void UI_DisplayStatus()
@@ -174,21 +186,23 @@ void UI_DisplayStatus()
                         } else 
                     #endif
                     {
-                        uint8_t xb = (gEeprom.CROSS_BAND_RX_TX != CROSS_BAND_OFF);
+{
+                            uint8_t xb = (gEeprom.CROSS_BAND_RX_TX != CROSS_BAND_OFF);
 
-                        if (gEeprom.DUAL_WATCH != DUAL_WATCH_OFF) {
-                            if (gDualWatchActive) { // DWR - dual watch + respond
-                                src = gFontDWR;
-                                sOff = xb ? 2 : 0;
-                                sSize = sizeof(gFontDWR) - (xb ? 5 : 0);
+                            if (gEeprom.DUAL_WATCH != DUAL_WATCH_OFF) {
+                                if (gDualWatchActive) { // DWR - dual watch + respond
+                                    src = gFontDWR;
+                                    sOff = xb ? 2 : 0;
+                                    sSize = sizeof(gFontDWR) - (xb ? 5 : 0);
+                                } else {
+                                    src = gFontHold;
+                                    sOff = 3;
+                                    sSize = sizeof(gFontHold);
+                                }
                             } else {
-                                src = gFontHold;
-                                sOff = 3;
-                                sSize = sizeof(gFontHold);
+                                src   = xb ? gFontXB         : gFontMO;          // XB - crossband
+                                sSize = xb ? sizeof(gFontXB) : sizeof(gFontMO);  // MO - main only
                             }
-                        } else {
-                            src   = xb ? gFontXB         : gFontMO;          // XB - crossband
-                            sSize = xb ? sizeof(gFontXB) : sizeof(gFontMO);  // MO - main only
                         }
                     }
 
@@ -212,18 +226,14 @@ void UI_DisplayStatus()
 #endif
 
 #ifdef ENABLE_FEAT_F4HWN
-    // PTT indicator
-    if(!gAirCopyBootMode) {
-        if (gSetting_set_ptt_session) {
-            memcpy(line + x, gFontPttOnePush, sizeof(gFontPttOnePush));
-            x1 = x + sizeof(gFontPttOnePush) + 1;
-        }
-        else
-        {
-            memcpy(line + x, gFontPttClassic, sizeof(gFontPttClassic));
-            x1 = x + sizeof(gFontPttClassic) + 1;       
-        }
+    // Former CL/OP / PTT-session indicator area reserved for Messenger unread
+    // notification.  MO/DWR above remains unchanged; CL/OP itself is not drawn.
+#ifdef ENABLE_MESSENGER
+    if (!gAirCopyBootMode && MSG_HasUnread()) {
+        memcpy(line + x, BITMAP_MSG_ENVELOPE, sizeof(BITMAP_MSG_ENVELOPE));
+        x1 = x + sizeof(BITMAP_MSG_ENVELOPE);
     }
+#endif
     x += sizeof(gFontPttClassic) + 3;
 #endif
 

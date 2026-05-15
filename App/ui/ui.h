@@ -34,6 +34,10 @@ enum GUI_DisplayType_t
     DISPLAY_AIRCOPY,
 #endif
 
+#ifdef ENABLE_MESSENGER
+    DISPLAY_MESSENGER,
+#endif
+
 #ifdef ENABLE_REGA
     DISPLAY_REGA,
 #endif

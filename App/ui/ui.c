@@ -37,6 +37,9 @@
 #include "ui/main.h"
 #include "ui/menu.h"
 #include "ui/scanner.h"
+#ifdef ENABLE_MESSENGER
+    #include "app/messenger_ui.h"
+#endif
 #include "ui/ui.h"
 #include "../misc.h"
 
@@ -63,6 +66,10 @@ void (*UI_DisplayFunctions[])(void) = {
 
 #ifdef ENABLE_REGA
     [DISPLAY_REGA] = &UI_DisplayREGA,
+#endif
+
+#ifdef ENABLE_MESSENGER
+    [DISPLAY_MESSENGER] = &UI_DisplayMessenger,
 #endif
 };
 

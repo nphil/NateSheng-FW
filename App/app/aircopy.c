@@ -41,7 +41,7 @@ uint16_t gAirCopyBlockNumber;
 uint16_t gErrorsDuringAirCopy;
 bool     gAirCopyIsSendMode;
 
-uint16_t g_FSK_Buffer[36];
+uint16_t g_FSK_Buffer[50];
 
 // ============================================================================
 // Transfer Maps Definition

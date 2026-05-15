@@ -141,6 +141,15 @@ enable_feature(ENABLE_FLASHLIGHT
     app/flashlight.c
 )
 
+enable_feature(ENABLE_MESSENGER
+    app/messenger.c
+    app/messenger_store.c
+    app/messenger_packet.c
+    app/messenger_t9.c
+    app/messenger_ui.c
+    app/messenger_rf.c
+)
+
 # ---- CUSTOM MODS ----
 
 enable_feature(ENABLE_SPECTRUM

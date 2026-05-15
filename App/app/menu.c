@@ -22,6 +22,9 @@
 #include "app/dtmf.h"
 #include "app/generic.h"
 #include "app/menu.h"
+#ifdef ENABLE_MESSENGER
+    #include "app/messenger_store.h"
+#endif
 #include "app/scanner.h"
 #include "audio.h"
 #include "board.h"
@@ -463,6 +466,25 @@ int MENU_GetLimits(uint8_t menu_id, int32_t *pMin, int32_t *pMax)
         #endif
 #endif
 
+        #ifdef ENABLE_MESSENGER
+        case MENU_MSG_CSG:
+            *pMax = 0;
+            break;
+        case MENU_MSG_RX:
+        case MENU_MSG_CALLTX:
+        case MENU_MSG_ACK:
+        case MENU_MSG_BEEP:
+        case MENU_MSG_DEBUG:
+            *pMax = 1;
+            break;
+        case MENU_MSG_HOP:
+            *pMax = 5;
+            break;
+        case MENU_MSG_LED:
+            *pMax = 2;
+            break;
+#endif
+
         case MENU_VOL: {
             // SysInf paginates: 
             // page 0 = identity, 
@@ -509,6 +531,25 @@ void MENU_AcceptSetting(void)
     {
         default:
             return;
+
+        #ifdef ENABLE_MESSENGER
+        case MENU_MSG_RX:
+            gMessengerConfig.msg_rx = gSubMenuSelection; MSG_STORE_SaveConfig(); break;
+        case MENU_MSG_CSG:
+            break;
+        case MENU_MSG_CALLTX:
+            gMessengerConfig.callsign_tx = gSubMenuSelection; MSG_STORE_SaveConfig(); break;
+        case MENU_MSG_ACK:
+            gMessengerConfig.msg_ack = gSubMenuSelection; MSG_STORE_SaveConfig(); break;
+        case MENU_MSG_HOP:
+            gMessengerConfig.msg_hop = gSubMenuSelection; MSG_STORE_SaveConfig(); break;
+        case MENU_MSG_BEEP:
+            gMessengerConfig.msg_beep = gSubMenuSelection; MSG_STORE_SaveConfig(); break;
+        case MENU_MSG_LED:
+            gMessengerConfig.msg_led = gSubMenuSelection; MSG_STORE_SaveConfig(); break;
+        case MENU_MSG_DEBUG:
+            gMessengerConfig.msg_debug = gSubMenuSelection; MSG_STORE_SaveConfig(); break;
+#endif
 
         case MENU_SQL:
             gEeprom.SQUELCH_LEVEL = gSubMenuSelection;
@@ -1059,6 +1100,25 @@ void MENU_ShowCurrentSetting(void)
 {
     switch (UI_MENU_GetCurrentMenuId())
     {
+        #ifdef ENABLE_MESSENGER
+        case MENU_MSG_RX:
+            MSG_STORE_Init(); gSubMenuSelection = gMessengerConfig.msg_rx; break;
+        case MENU_MSG_CSG:
+            MSG_STORE_Init(); gSubMenuSelection = 0; break;
+        case MENU_MSG_CALLTX:
+            MSG_STORE_Init(); gSubMenuSelection = gMessengerConfig.callsign_tx; break;
+        case MENU_MSG_ACK:
+            MSG_STORE_Init(); gSubMenuSelection = gMessengerConfig.msg_ack; break;
+        case MENU_MSG_HOP:
+            MSG_STORE_Init(); gSubMenuSelection = gMessengerConfig.msg_hop; break;
+        case MENU_MSG_BEEP:
+            MSG_STORE_Init(); gSubMenuSelection = gMessengerConfig.msg_beep; break;
+        case MENU_MSG_LED:
+            MSG_STORE_Init(); gSubMenuSelection = gMessengerConfig.msg_led; break;
+        case MENU_MSG_DEBUG:
+            MSG_STORE_Init(); gSubMenuSelection = gMessengerConfig.msg_debug; break;
+#endif
+
         case MENU_SQL:
             gSubMenuSelection = gEeprom.SQUELCH_LEVEL;
             break;
