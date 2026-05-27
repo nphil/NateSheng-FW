@@ -535,9 +535,9 @@ ifeq ($(DEBUG),1)
 endif
 
 INC =
-INC += -I $(TOP)
-INC += -I $(TOP)/external/CMSIS_5/CMSIS/Core/Include/
-INC += -I $(TOP)/external/CMSIS_5/Device/ARM/ARMCM0/Include
+INC += -I "$(TOP)"
+INC += -I "$(TOP)/external/CMSIS_5/CMSIS/Core/Include/"
+INC += -I "$(TOP)/external/CMSIS_5/Device/ARM/ARMCM0/Include"
 
 LIBS =
 

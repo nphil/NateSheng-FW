@@ -204,7 +204,8 @@ static void SendVersion(void)
 
     Reply.Header.ID = 0x0515;
     Reply.Header.Size = sizeof(Reply.Data);
-    strcpy(Reply.Data.Version, Version);
+    strncpy(Reply.Data.Version, Version, sizeof(Reply.Data.Version) - 1);
+    Reply.Data.Version[sizeof(Reply.Data.Version) - 1] = '\0';
     Reply.Data.bHasCustomAesKey = bHasCustomAesKey;
     Reply.Data.bIsInLockScreen = bIsInLockScreen;
     Reply.Data.Challenge[0] = gChallenge[0];
