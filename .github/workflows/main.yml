@@ -1,8 +1,14 @@
-name: Build Firmware
+name: Build and Release Firmware
 
 on:
   push:
     branches: [ main ]
+    tags: [ 'v*' ]
+  pull_request:
+    branches: [ main ]
+
+permissions:
+  contents: write
 
 jobs:
   build:
@@ -10,15 +16,101 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
 
-    - name: Compile firmware
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.x'
+
+    - name: Install compiler and dependencies
       run: |
-        chmod +x compile-with-docker.sh
-        ./compile-with-docker.sh
+        sudo apt-get update
+        sudo apt-get install -y gcc-arm-none-eabi libnewlib-arm-none-eabi make zip
+        python3 -m pip install crcmod
 
-    - name: Upload firmware artifact
+    - name: Determine version name
+      run: |
+        if [[ "${{ github.ref_type }}" == "tag" ]]; then
+          echo "VERSION=${{ github.ref_name }}" >> $GITHUB_ENV
+          if [[ "${{ github.ref_name }}" == *"beta"* || "${{ github.ref_name }}" == *"alpha"* || "${{ github.ref_name }}" == *"rc"* || "${{ github.ref_name }}" == *"-"* ]]; then
+            echo "PRERELEASE=true" >> $GITHUB_ENV
+          else
+            echo "PRERELEASE=false" >> $GITHUB_ENV
+          fi
+        else
+          SHORT_SHA=$(echo "${{ github.sha }}" | cut -c1-8)
+          echo "VERSION=dev-$SHORT_SHA" >> $GITHUB_ENV
+          echo "PRERELEASE=true" >> $GITHUB_ENV
+        fi
+
+    - name: Compile all firmware variants
+      run: |
+        mkdir -p release-assets
+        
+        # 1. Custom
+        make clean
+        make VERSION_STRING_2="${{ env.VERSION }}" EDITION_STRING=Custom TARGET=f4hwn.custom
+        cp f4hwn.custom.bin release-assets/
+        cp f4hwn.custom.packed.bin release-assets/
+        
+        # 2. Standard
+        make clean
+        make VERSION_STRING_2="${{ env.VERSION }}" ENABLE_SPECTRUM=0 ENABLE_FMRADIO=0 ENABLE_AIRCOPY=0 ENABLE_NOAA=0 EDITION_STRING=Standard TARGET=f4hwn.standard
+        cp f4hwn.standard.bin release-assets/
+        cp f4hwn.standard.packed.bin release-assets/
+        
+        # 3. Bandscope
+        make clean
+        make VERSION_STRING_2="${{ env.VERSION }}" ENABLE_SPECTRUM=1 ENABLE_FMRADIO=0 ENABLE_VOX=0 ENABLE_AIRCOPY=1 ENABLE_FEAT_F4HWN_SCREENSHOT=1 ENABLE_FEAT_F4HWN_GAME=0 ENABLE_FEAT_F4HWN_PMR=1 ENABLE_FEAT_F4HWN_GMRS_FRS_MURS=1 ENABLE_NOAA=0 ENABLE_FEAT_F4HWN_RESCUE_OPS=0 EDITION_STRING=Bandscope TARGET=f4hwn.bandscope
+        cp f4hwn.bandscope.bin release-assets/
+        cp f4hwn.bandscope.packed.bin release-assets/
+        
+        # 4. Broadcast
+        make clean
+        make VERSION_STRING_2="${{ env.VERSION }}" ENABLE_SPECTRUM=0 ENABLE_FMRADIO=1 ENABLE_VOX=1 ENABLE_AIRCOPY=1 ENABLE_FEAT_F4HWN_SCREENSHOT=1 ENABLE_FEAT_F4HWN_GAME=0 ENABLE_FEAT_F4HWN_PMR=1 ENABLE_FEAT_F4HWN_GMRS_FRS_MURS=1 ENABLE_NOAA=0 ENABLE_FEAT_F4HWN_RESCUE_OPS=0 EDITION_STRING=Broadcast TARGET=f4hwn.broadcast
+        cp f4hwn.broadcast.bin release-assets/
+        cp f4hwn.broadcast.packed.bin release-assets/
+        
+        # 5. Basic
+        make clean
+        make VERSION_STRING_2="${{ env.VERSION }}" ENABLE_SPECTRUM=1 ENABLE_FMRADIO=1 ENABLE_VOX=0 ENABLE_AIRCOPY=0 ENABLE_FEAT_F4HWN_GAME=0 ENABLE_FEAT_F4HWN_SPECTRUM=0 ENABLE_FEAT_F4HWN_PMR=1 ENABLE_FEAT_F4HWN_GMRS_FRS_MURS=1 ENABLE_NOAA=0 ENABLE_AUDIO_BAR=0 ENABLE_FEAT_F4HWN_RESUME_STATE=0 ENABLE_FEAT_F4HWN_CHARGING_C=0 ENABLE_FEAT_F4HWN_INV=1 ENABLE_FEAT_F4HWN_CTR=0 ENABLE_FEAT_F4HWN_NARROWER=1 ENABLE_FEAT_F4HWN_RESCUE_OPS=0 EDITION_STRING=Basic TARGET=f4hwn.basic
+        cp f4hwn.basic.bin release-assets/
+        cp f4hwn.basic.packed.bin release-assets/
+        
+        # 6. RescueOps
+        make clean
+        make VERSION_STRING_2="${{ env.VERSION }}" ENABLE_SPECTRUM=0 ENABLE_FMRADIO=0 ENABLE_VOX=1 ENABLE_AIRCOPY=1 ENABLE_FEAT_F4HWN_SCREENSHOT=1 ENABLE_FEAT_F4HWN_GAME=0 ENABLE_FEAT_F4HWN_PMR=1 ENABLE_FEAT_F4HWN_GMRS_FRS_MURS=1 ENABLE_NOAA=1 ENABLE_FEAT_F4HWN_RESCUE_OPS=1 EDITION_STRING=RescueOps TARGET=f4hwn.rescueops
+        cp f4hwn.rescueops.bin release-assets/
+        cp f4hwn.rescueops.packed.bin release-assets/
+        
+        # 7. Game
+        make clean
+        make VERSION_STRING_2="${{ env.VERSION }}" ENABLE_SPECTRUM=0 ENABLE_FMRADIO=1 ENABLE_VOX=0 ENABLE_AIRCOPY=1 ENABLE_FEAT_F4HWN_GAME=1 ENABLE_FEAT_F4HWN_PMR=1 ENABLE_FEAT_F4HWN_GMRS_FRS_MURS=1 ENABLE_NOAA=0 ENABLE_FEAT_F4HWN_RESCUE_OPS=0 EDITION_STRING=Game TARGET=f4hwn.game
+        cp f4hwn.game.bin release-assets/
+        cp f4hwn.game.packed.bin release-assets/
+
+    - name: Package all assets
+      run: |
+        cd release-assets
+        zip -j f4hwn-firmware-all.zip *
+
+    - name: Upload artifacts (CI)
       uses: actions/upload-artifact@v4
       with:
-        name: firmware-artifact
-        path: compiled-firmware/f4hwn.packed.bin
+        name: f4hwn-firmware-variants-${{ env.VERSION }}
+        path: release-assets/
+
+    - name: Create Release and Upload Assets (CD)
+      if: github.ref_type == 'tag'
+      uses: softprops/action-gh-release@v2
+      with:
+        files: |
+          release-assets/*.bin
+          release-assets/*.packed.bin
+          release-assets/*.zip
+        prerelease: ${{ env.PRERELEASE }}
+        generate_release_notes: true
+        token: ${{ secrets.GITHUB_TOKEN }}
