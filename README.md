@@ -1,187 +1,57 @@
-# Stats
+# NateSheng-FW
 
-![GitHub stars](https://img.shields.io/github/stars/Gogu-Qs/GOGUFW-UV-K1-Messenger?style=for-the-badge)
-![GitHub forks](https://img.shields.io/github/forks/Gogu-Qs/GOGUFW-UV-K1-Messenger?style=for-the-badge)
-![GitHub release](https://img.shields.io/github/v/release/Gogu-Qs/GOGUFW-UV-K1-Messenger?style=for-the-badge)
-![GitHub downloads](https://img.shields.io/github/downloads/Gogu-Qs/GOGUFW-UV-K1-Messenger/total?style=for-the-badge)
+A custom firmware fork for the **Quansheng UV-K5 / K6 / 5R-Plus**
+(DP32G030 MCU), targeting **performance, UX, and sensible features**.
 
----
-
-# GOGUFW - UV-K1 Messenger Firmware
-
-Custom experimental messenger firmware for the Quansheng UV-K1 / K5V3 platform.
-
-Based on:
-- F4HWN Fusion
-- EGZUMER
-- UV-K5 / UV-K1 open firmware ecosystem
-
-GOGUFW focuses on adding a lightweight off-grid FSK messaging system while preserving normal radio usability and voice performance.
+**Upstream**: [`armel/uv-k5-firmware-custom`](https://github.com/armel/uv-k5-firmware-custom)
+(F4HWN v4.3, on EGZUMER v0.22, on DualTachyon's open base).
 
 ---
 
-FOR MESSENGER PRESS F + MENU
+## Repository layout
 
-# Features
+```
+.                       # ← F4HWN UV-K5 firmware source (build target)
+├── Makefile            # make → firmware → firmware.packed.bin
+├── firmware.ld         # 60 KB FLASH @ 0x00000000, 16 KB RAM
+├── main.c, app/, driver/, ui/, helper/, bsp/, hardware/
+├── fw-pack.py          # Wraps .bin into stock-updater-compatible .packed.bin
+├── compile-with-docker.sh
+│
+├── CLAUDE.md           # ★ Working notes — start here for context
+├── README.md           # (this file)
+│
+└── reference/
+    └── k1-gogufw/      # GOGUFW 0.3.12 for UV-K1 (PY32F071) — preserved
+                        # as the source of the FSK messenger subsystem we'll
+                        # back-port. NOT built as part of the K5 firmware.
+```
 
-## Messenger System
-
-- FSK text messaging
-- ACK / Retry delivery system
-- Random ACK delay collision reduction
-- Retry timeout protection
-- Background RF receive
-- Boot-time RF initialization
-- Draft message storage
-- Sent / Inbox / Drafts UI
-- Message resend
-- Reply support
-- Unread message notification
-- Status bar envelope icon
-- Persistent settings
-- T9 compose keyboard
-- Broadcast messaging
-- Hop-aware packet structure
-
----
-
-# Messenger UI Features
-
-## Messenger Home Screen
-
-- Pixel-art menu icons
-- Envelope icon for Inbox
-- Pencil icon for Compose
-- Upload arrow icon for Sent
-- Floppy disk icon for Drafts
-- Compact LCD-style UI layout
-- Small-font metadata rendering
-- Dashed separators
-- Optimized screen spacing
-
----
-
-# Compose Screen
-
-- T9 text input
-- B / b / 2 mode indicator
-- Long-press numeric input
-- Character counter
-- Draft save support
-- 36 character optimized payload length
-
----
-
-# Inbox / Sent Features
-
-- Compact metadata header
-- Hop display support
-- Delivery state indicators
-- Resend support
-- Delete support
-- Reply support
-
----
-
-# RF Features
-
-## ACK / Retry System
-
-- ACK timeout protection
-- Randomized ACK delay
-- Retry collision reduction
-- Delayed retry scheduler
-- Improved reliability in multi-radio environments
-
-# Screenshots
-
-## Messenger Home
-
-![Messenger Home](uv-k5-screenshot17.png)
-
-## Compose Screen
-
-![Compose](uv-k5-screenshot19.png)
-
-## Inbox
-
-![Inbox](uv-k5-screenshot18.png)
-
-## Sent
-
-![Inbox](uv-k5-screenshot20.png)
-
----
-
-# Planned Features
-
-- Automatic range check system
-- Midland-compatible ping/pong experiments
-- Auto range monitoring
-- FM radio memory naming
-- CHIRP integration updates
-- Relay / mesh improvements
-- Hop routing improvements
-- Additional message tools
-
----
-
-# Build
-
-Build firmware using Docker:
+## Build
 
 ```bash
-
-chmod +x compile-with-docker.sh
-
-./compile-with-docker.sh Fusion
-
+./compile-with-docker.sh       # uses Docker, no host toolchain needed
+# or with arm-none-eabi-gcc on the host:
+make                           # → firmware.bin + firmware.packed.bin
 ```
 
-The build output will appear under:
+`firmware.packed.bin` is what you flash with the **stock Quansheng updater**
+(or [`k5prog`](https://github.com/sq5bpf/k5prog)).
 
-```text
+**Recommended: back up your EEPROM first** with `k5prog -r` before flashing
+any non-stock firmware.
 
-build/Fusion/
+## What's coming
 
-```
+Tracked in `CLAUDE.md §10`:
 
-VS Code build support is included.
-
-## Credits
-
-Huge respect to:
-
-* F4HWN
-* EGZUMER
-* UV-K5 open firmware contributors
-* The Quansheng modding community
-* and others I forget
-
-Warning
-
-This firmware is experimental.
-
-Messenger and RF features are still under active development and may contain bugs or unfinished functionality.
-
-Use at your own risk.
+- Back-port the **FSK text messenger** from the GOGUFW K1 fork
+  (`reference/k1-gogufw/App/app/messenger*`) — the marquee feature
+- Aggressive feature trim to fit messenger inside the 60 KB flash budget
+- Font pruning, dirty-rect LCD updates, BK4819 register write cache
+- A working GitHub Actions build CI
 
 ## License
 
-Copyright (c) 2023 DualTachyon
-Copyright (c) 2024-2025 EGZUMER / F4HWN contributors
-
-Additional modifications and Messenger system:
-Copyright (c) 2026 GOGUFW / Gogu-Qs
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-    Unless required by applicable law or agreed to in writing, software
-    distributed under the License is distributed on an "AS IS" BASIS,
-    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-    See the License for the specific language governing permissions and
-    limitations under the License.
+Apache 2.0. See `LICENSE`. Original copyright DualTachyon; F4HWN and
+EGZUMER contributions per their respective copyright notices in source files.

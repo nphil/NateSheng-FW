@@ -4,12 +4,12 @@ The user has a classic **Quansheng UV-K5** (DP32G030 MCU) and wants to build
 their own optimized firmware for it. Focus: **performance, UX, sensible features**,
 plus a back-port of the **FSK text messenger** subsystem from a sister fork.
 
-Two repos are in scope in this environment:
+**This repo is now the user's UV-K5 fork.** Layout:
 
-| Path | What it is | Role |
-|------|------------|------|
-| **`/home/user/NateSheng-FW`** (this repo, branch `claude/uv-k1-firmware-study-fpSNS`) | **GOGUFW 0.3.12**, a UV-K1 / K5V3 firmware on PY32F071 MCU. Forked from F4HWN's K1 port, with a custom FSK messenger added | **Only repo we can push to.** Also the **source of truth for messenger code** to port back to K5. The K1 hardware is the **wrong target** for the user. |
-| **`/home/user/uv-k5-f4hwn`** (cloned from `armel/uv-k5-firmware-custom`) | **F4HWN custom firmware** for the classic UV-K5 (DP32G030). The actual ancestor of GOGUFW, minus the messenger | **Reference & starting point** for the user's fork. Lives in the ephemeral container only — re-clone after each session |
+| Path | What it is |
+|------|------------|
+| Repo root (`./`) | **F4HWN UV-K5 firmware source** — the active build target. `make` here produces `firmware.bin` + `firmware.packed.bin`. Forked at F4HWN v4.3 on EGZUMER v0.22 on DualTachyon's open base |
+| `./reference/k1-gogufw/` | **GOGUFW 0.3.12 for UV-K1 (PY32F071)** — preserved as the **source of truth for the FSK messenger subsystem** we'll back-port. NOT built as part of the K5 firmware. Look here for `App/app/messenger*.c` |
 
 Lineage:
 
@@ -463,25 +463,17 @@ budget:
 
 ## 12. Git / branch policy (this session)
 
-- Working branch: `claude/uv-k1-firmware-study-fpSNS` in `/home/user/NateSheng-FW`.
-- The repo name still has "uv-k1" in it; that's a session artifact. Notes
-  live here because this is the **only** repo I'm allowed to push to from
-  this environment (`nphil/natesheng-fw`).
-- `/home/user/uv-k5-f4hwn` is a throwaway clone; re-clone via
-  `git clone --depth 1 https://github.com/armel/uv-k5-firmware-custom.git
-  uv-k5-f4hwn` each session.
+- Working branch: `claude/uv-k1-firmware-study-fpSNS` (named before the K5
+  pivot — content is now K5-focused; harmless cosmetic mismatch).
+- All work commits to this branch; `git push -u origin claude/uv-k1-firmware-study-fpSNS`.
 - Don't open a PR unless explicitly asked.
-
-**Open question for the user**: at some point we'll need to decide whether
-the user's K5 fork lives in this repo (replacing the K1 GOGUFW code on the
-branch) or in a brand-new repo. For now, this repo stays a notes + reference
-workspace.
+- The GitHub MCP tools are restricted to `nphil/natesheng-fw` only.
 
 ---
 
 ## 13. Quick navigation cheat-sheet (K5 paths)
 
-| I want to... | Look here (in `/home/user/uv-k5-f4hwn`) |
+| I want to... | Look here (paths relative to repo root) |
 |--------------|-----------------------------------------|
 | Change the main loop | `main.c`, `app/app.c` (APP_Update / APP_TimeSlice10ms / APP_TimeSlice500ms) |
 | Add an ISR-timed countdown | `scheduler.c` |
@@ -497,16 +489,16 @@ workspace.
 | Pack a build for the stock updater | `fw-pack.py` (already wired into `make`) |
 | Flash via SWD | `make flash` (Makefile:567, uses `dp32g030.cfg`) |
 
-For messenger reference (back-port source):
+For messenger reference (back-port source — all under `reference/k1-gogufw/`):
 
-| Module | Location in K1 GOGUFW |
-|--------|------------------------|
-| Packet format | `/home/user/NateSheng-FW/App/app/messenger_packet.{c,h}` |
-| RF / TX-RX / ACK | `/home/user/NateSheng-FW/App/app/messenger_rf.c` (1143 LOC) |
-| Inbox/outbox/drafts | `/home/user/NateSheng-FW/App/app/messenger_store.{c,h}` |
-| T9 input | `/home/user/NateSheng-FW/App/app/messenger_t9.{c,h}` |
-| UI state machine | `/home/user/NateSheng-FW/App/app/messenger.{c,h}` |
-| UI rendering | `/home/user/NateSheng-FW/App/app/messenger_ui.{c,h}` |
+| Module | Path |
+|--------|------|
+| Packet format | `reference/k1-gogufw/App/app/messenger_packet.{c,h}` |
+| RF / TX-RX / ACK | `reference/k1-gogufw/App/app/messenger_rf.c` (1143 LOC) |
+| Inbox/outbox/drafts | `reference/k1-gogufw/App/app/messenger_store.{c,h}` |
+| T9 input | `reference/k1-gogufw/App/app/messenger_t9.{c,h}` |
+| UI state machine | `reference/k1-gogufw/App/app/messenger.{c,h}` |
+| UI rendering | `reference/k1-gogufw/App/app/messenger_ui.{c,h}` |
 
 ---
 
