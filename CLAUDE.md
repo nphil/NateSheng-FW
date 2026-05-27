@@ -461,11 +461,11 @@ budget:
 
 ---
 
-## 12. Git / branch policy (this session)
+## 12. Git / branch policy
 
-- Working branch: `claude/uv-k1-firmware-study-fpSNS` (named before the K5
-  pivot — content is now K5-focused; harmless cosmetic mismatch).
-- All work commits to this branch; `git push -u origin claude/uv-k1-firmware-study-fpSNS`.
+- The study branch `claude/uv-k1-firmware-study-fpSNS` has been **merged into
+  `main`** (2026-05-27). All work now happens on `main` directly.
+- Feature branches are welcome for larger changes; merge back to `main` when ready.
 - Don't open a PR unless explicitly asked.
 - The GitHub MCP tools are restricted to `nphil/natesheng-fw` only.
 
@@ -526,6 +526,6 @@ For messenger reference (back-port source — all under `reference/k1-gogufw/`):
 
 ---
 
-_Last updated: study performed by Claude after the user clarified the target is
-classic UV-K5, not UV-K1. K5 reference: `armel/uv-k5-firmware-custom` (F4HWN
-v4.3 on EGZUMER v0.22)._
+_Last updated: 2026-05-27. Study branch merged to `main`. Target: classic UV-K5
+(DP32G030). K5 base: `armel/uv-k5-firmware-custom` (F4HWN v4.3 on EGZUMER
+v0.22). K1 messenger reference preserved in `reference/k1-gogufw/`._
