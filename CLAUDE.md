@@ -28,7 +28,7 @@ Lineage:
 | Radio IC | **BK4819** (VHF/UHF) — same chip as K1, same driver |
 | FM tuner | **BK1080** (optional, `ENABLE_FMRADIO`) — same as K1 |
 | LCD | **ST7565** 128×64 mono, SPI, single 1024 B framebuffer — same as K1 |
-| **Persistent store** | **I²C 24C64-style EEPROM, 8 KB** at slave addr `0xA0`, 16-bit register address, 8-byte page writes. Used for everything: settings, channels, DTMF, calibration. (`driver/eeprom.c:25`) |
+| **Persistent store** | **Upgraded I²C EEPROM support** (statically configurable up to 512KB / 4Mbit via `ENABLE_EEPROM_512K` etc., defaults to 512KB). Uses 32-bit addressing and I2C page select paging. Standard settings, channels, and calibration data remain in the first 8KB. (`driver/eeprom.c:24`) |
 | UART | **Yes**, used both for the CPS protocol and for flashing via `k5prog` |
 | USB | **No** — DP32G030 has no USB peripheral. Anything that needs PC-side comms goes over UART |
 | Bootloader | None after flashing custom FW. Recovery = re-flash over UART with PTT+SIDE1 held to enter the stock loader (which can also accept `.packed.bin` from the stock Quansheng updater) |
@@ -263,15 +263,16 @@ copy lives in **`/home/user/NateSheng-FW/App/app/messenger*`** (~2500 LOC across
 
 ---
 
-## 6. Settings & EEPROM map (8 KB I²C 24C64)
+## 6. Settings & EEPROM map
 
-K5 stores **everything** persistent in 8 KB of I²C EEPROM (`driver/eeprom.c`).
+The codebase supports standard (8 KB) and upgraded (128 KB, 256 KB, 512 KB) EEPROMs. The memory map for the first 8 KB remains identical for backwards compatibility:
 Read/write semantics:
 
-- I²C slave `0xA0` (24Cxx family).
-- 16-bit register address.
+- I²C slave `0xA0 | (((Address >> 16) & 7) << 1)` for block paging.
+- 32-bit register address (`uint32_t Address`).
 - Reads: arbitrary length.
 - Writes: **8-byte page granularity** with 8 ms burn delay (`EEPROM_WriteBuffer`).
+- Safety bounds check using `EEPROM_MAX_SIZE` to prevent address wrap-around corruption on smaller EEPROMs.
 - Optimization already in place: read-before-write skip if data is unchanged.
 
 Approximate map (from `settings.c` and EGZUMER docs):

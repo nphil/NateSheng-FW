@@ -19,8 +19,18 @@
 
 #include <stdint.h>
 
-void EEPROM_ReadBuffer(uint16_t Address, void *pBuffer, uint8_t Size);
-void EEPROM_WriteBuffer(uint16_t Address, const void *pBuffer);
+#if defined(ENABLE_EEPROM_512K)
+    #define EEPROM_MAX_SIZE 0x80000 // 512KB
+#elif defined(ENABLE_EEPROM_256K)
+    #define EEPROM_MAX_SIZE 0x40000 // 256KB
+#elif defined(ENABLE_EEPROM_128K)
+    #define EEPROM_MAX_SIZE 0x20000 // 128KB
+#else
+    #define EEPROM_MAX_SIZE 0x2000  // 8KB (Stock)
+#endif
+
+void EEPROM_ReadBuffer(uint32_t Address, void *pBuffer, uint8_t Size);
+void EEPROM_WriteBuffer(uint32_t Address, const void *pBuffer);
 
 #endif
 

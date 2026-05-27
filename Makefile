@@ -3,6 +3,12 @@
 # 0 = disable
 # 1 = enable
 
+# ---- EEPROM UPGRADES ----
+# Set only one of these to 1 depending on your hardware modification
+ENABLE_EEPROM_128K              ?= 0
+ENABLE_EEPROM_256K              ?= 0
+ENABLE_EEPROM_512K              ?= 1
+
 # ---- STOCK QUANSHENG FEATURES ----
 ENABLE_FMRADIO                  ?= 0
 ENABLE_UART                     ?= 1
@@ -504,6 +510,16 @@ ifeq ($(ENABLE_FEAT_F4HWN_DEBUG),1)
 endif
 ifeq ($(ENABLE_EXTRA_UART_CMD),1)
 	CFLAGS  += -DENABLE_EXTRA_UART_CMD
+endif
+
+ifeq ($(ENABLE_EEPROM_128K),1)
+	CFLAGS  += -DENABLE_EEPROM_128K
+endif
+ifeq ($(ENABLE_EEPROM_256K),1)
+	CFLAGS  += -DENABLE_EEPROM_256K
+endif
+ifeq ($(ENABLE_EEPROM_512K),1)
+	CFLAGS  += -DENABLE_EEPROM_512K
 endif
 
 LDFLAGS =
