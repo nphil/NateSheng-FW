@@ -49,48 +49,56 @@ jobs:
     - name: Compile all firmware variants
       run: |
         mkdir -p release-assets
-        
-        # 1. Custom
-        make clean
-        make VERSION_STRING_2="${{ env.VERSION }}" EDITION_STRING=Custom TARGET=f4hwn.custom
-        cp f4hwn.custom.bin release-assets/
-        cp f4hwn.custom.packed.bin release-assets/
-        
-        # 2. Standard
-        make clean
-        make VERSION_STRING_2="${{ env.VERSION }}" ENABLE_SPECTRUM=0 ENABLE_FMRADIO=0 ENABLE_AIRCOPY=0 ENABLE_NOAA=0 EDITION_STRING=Standard TARGET=f4hwn.standard
-        cp f4hwn.standard.bin release-assets/
-        cp f4hwn.standard.packed.bin release-assets/
-        
-        # 3. Bandscope
-        make clean
-        make VERSION_STRING_2="${{ env.VERSION }}" ENABLE_SPECTRUM=1 ENABLE_FMRADIO=0 ENABLE_VOX=0 ENABLE_AIRCOPY=1 ENABLE_FEAT_F4HWN_SCREENSHOT=1 ENABLE_FEAT_F4HWN_GAME=0 ENABLE_FEAT_F4HWN_PMR=1 ENABLE_FEAT_F4HWN_GMRS_FRS_MURS=1 ENABLE_NOAA=0 ENABLE_FEAT_F4HWN_RESCUE_OPS=0 EDITION_STRING=Bandscope TARGET=f4hwn.bandscope
-        cp f4hwn.bandscope.bin release-assets/
-        cp f4hwn.bandscope.packed.bin release-assets/
-        
-        # 4. Broadcast
-        make clean
-        make VERSION_STRING_2="${{ env.VERSION }}" ENABLE_SPECTRUM=0 ENABLE_FMRADIO=1 ENABLE_VOX=1 ENABLE_AIRCOPY=1 ENABLE_FEAT_F4HWN_SCREENSHOT=1 ENABLE_FEAT_F4HWN_GAME=0 ENABLE_FEAT_F4HWN_PMR=1 ENABLE_FEAT_F4HWN_GMRS_FRS_MURS=1 ENABLE_NOAA=0 ENABLE_FEAT_F4HWN_RESCUE_OPS=0 EDITION_STRING=Broadcast TARGET=f4hwn.broadcast
-        cp f4hwn.broadcast.bin release-assets/
-        cp f4hwn.broadcast.packed.bin release-assets/
-        
-        # 5. Basic
-        make clean
-        make VERSION_STRING_2="${{ env.VERSION }}" ENABLE_SPECTRUM=1 ENABLE_FMRADIO=1 ENABLE_VOX=0 ENABLE_AIRCOPY=0 ENABLE_FEAT_F4HWN_GAME=0 ENABLE_FEAT_F4HWN_SPECTRUM=0 ENABLE_FEAT_F4HWN_PMR=1 ENABLE_FEAT_F4HWN_GMRS_FRS_MURS=1 ENABLE_NOAA=0 ENABLE_AUDIO_BAR=0 ENABLE_FEAT_F4HWN_RESUME_STATE=0 ENABLE_FEAT_F4HWN_CHARGING_C=0 ENABLE_FEAT_F4HWN_INV=1 ENABLE_FEAT_F4HWN_CTR=0 ENABLE_FEAT_F4HWN_NARROWER=1 ENABLE_FEAT_F4HWN_RESCUE_OPS=0 EDITION_STRING=Basic TARGET=f4hwn.basic
-        cp f4hwn.basic.bin release-assets/
-        cp f4hwn.basic.packed.bin release-assets/
-        
-        # 6. RescueOps
-        make clean
-        make VERSION_STRING_2="${{ env.VERSION }}" ENABLE_SPECTRUM=0 ENABLE_FMRADIO=0 ENABLE_VOX=1 ENABLE_AIRCOPY=1 ENABLE_FEAT_F4HWN_SCREENSHOT=1 ENABLE_FEAT_F4HWN_GAME=0 ENABLE_FEAT_F4HWN_PMR=1 ENABLE_FEAT_F4HWN_GMRS_FRS_MURS=1 ENABLE_NOAA=1 ENABLE_FEAT_F4HWN_RESCUE_OPS=1 EDITION_STRING=RescueOps TARGET=f4hwn.rescueops
-        cp f4hwn.rescueops.bin release-assets/
-        cp f4hwn.rescueops.packed.bin release-assets/
-        
-        # 7. Game
-        make clean
-        make VERSION_STRING_2="${{ env.VERSION }}" ENABLE_SPECTRUM=0 ENABLE_FMRADIO=1 ENABLE_VOX=0 ENABLE_AIRCOPY=1 ENABLE_FEAT_F4HWN_GAME=1 ENABLE_FEAT_F4HWN_PMR=1 ENABLE_FEAT_F4HWN_GMRS_FRS_MURS=1 ENABLE_NOAA=0 ENABLE_FEAT_F4HWN_RESCUE_OPS=0 EDITION_STRING=Game TARGET=f4hwn.game
-        cp f4hwn.game.bin release-assets/
-        cp f4hwn.game.packed.bin release-assets/
+        (
+          # 1. Custom
+          make clean
+          make VERSION_STRING_2="${{ env.VERSION }}" EDITION_STRING=Custom TARGET=f4hwn.custom
+          cp f4hwn.custom.bin release-assets/
+          cp f4hwn.custom.packed.bin release-assets/
+          
+          # 2. Standard
+          make clean
+          make VERSION_STRING_2="${{ env.VERSION }}" ENABLE_SPECTRUM=0 ENABLE_FMRADIO=0 ENABLE_AIRCOPY=0 ENABLE_NOAA=0 EDITION_STRING=Standard TARGET=f4hwn.standard
+          cp f4hwn.standard.bin release-assets/
+          cp f4hwn.standard.packed.bin release-assets/
+          
+          # 3. Bandscope
+          make clean
+          make VERSION_STRING_2="${{ env.VERSION }}" ENABLE_SPECTRUM=1 ENABLE_FMRADIO=0 ENABLE_VOX=0 ENABLE_AIRCOPY=1 ENABLE_FEAT_F4HWN_SCREENSHOT=1 ENABLE_FEAT_F4HWN_GAME=0 ENABLE_FEAT_F4HWN_PMR=1 ENABLE_FEAT_F4HWN_GMRS_FRS_MURS=1 ENABLE_NOAA=0 ENABLE_FEAT_F4HWN_RESCUE_OPS=0 EDITION_STRING=Bandscope TARGET=f4hwn.bandscope
+          cp f4hwn.bandscope.bin release-assets/
+          cp f4hwn.bandscope.packed.bin release-assets/
+          
+          # 4. Broadcast
+          make clean
+          make VERSION_STRING_2="${{ env.VERSION }}" ENABLE_SPECTRUM=0 ENABLE_FMRADIO=1 ENABLE_VOX=1 ENABLE_AIRCOPY=1 ENABLE_FEAT_F4HWN_SCREENSHOT=1 ENABLE_FEAT_F4HWN_GAME=0 ENABLE_FEAT_F4HWN_PMR=1 ENABLE_FEAT_F4HWN_GMRS_FRS_MURS=1 ENABLE_NOAA=0 ENABLE_FEAT_F4HWN_RESCUE_OPS=0 EDITION_STRING=Broadcast TARGET=f4hwn.broadcast
+          cp f4hwn.broadcast.bin release-assets/
+          cp f4hwn.broadcast.packed.bin release-assets/
+          
+          # 5. Basic
+          make clean
+          make VERSION_STRING_2="${{ env.VERSION }}" ENABLE_SPECTRUM=1 ENABLE_FMRADIO=1 ENABLE_VOX=0 ENABLE_AIRCOPY=0 ENABLE_FEAT_F4HWN_GAME=0 ENABLE_FEAT_F4HWN_SPECTRUM=0 ENABLE_FEAT_F4HWN_PMR=1 ENABLE_FEAT_F4HWN_GMRS_FRS_MURS=1 ENABLE_NOAA=0 ENABLE_AUDIO_BAR=0 ENABLE_FEAT_F4HWN_RESUME_STATE=0 ENABLE_FEAT_F4HWN_CHARGING_C=0 ENABLE_FEAT_F4HWN_INV=1 ENABLE_FEAT_F4HWN_CTR=0 ENABLE_FEAT_F4HWN_NARROWER=1 ENABLE_FEAT_F4HWN_RESCUE_OPS=0 EDITION_STRING=Basic TARGET=f4hwn.basic
+          cp f4hwn.basic.bin release-assets/
+          cp f4hwn.basic.packed.bin release-assets/
+          
+          # 6. RescueOps
+          make clean
+          make VERSION_STRING_2="${{ env.VERSION }}" ENABLE_SPECTRUM=0 ENABLE_FMRADIO=0 ENABLE_VOX=1 ENABLE_AIRCOPY=1 ENABLE_FEAT_F4HWN_SCREENSHOT=1 ENABLE_FEAT_F4HWN_GAME=0 ENABLE_FEAT_F4HWN_PMR=1 ENABLE_FEAT_F4HWN_GMRS_FRS_MURS=1 ENABLE_NOAA=1 ENABLE_FEAT_F4HWN_RESCUE_OPS=1 EDITION_STRING=RescueOps TARGET=f4hwn.rescueops
+          cp f4hwn.rescueops.bin release-assets/
+          cp f4hwn.rescueops.packed.bin release-assets/
+          
+          # 7. Game
+          make clean
+          make VERSION_STRING_2="${{ env.VERSION }}" ENABLE_SPECTRUM=0 ENABLE_FMRADIO=1 ENABLE_VOX=0 ENABLE_AIRCOPY=1 ENABLE_FEAT_F4HWN_GAME=1 ENABLE_FEAT_F4HWN_PMR=1 ENABLE_FEAT_F4HWN_GMRS_FRS_MURS=1 ENABLE_NOAA=0 ENABLE_FEAT_F4HWN_RESCUE_OPS=0 EDITION_STRING=Game TARGET=f4hwn.game
+          cp f4hwn.game.bin release-assets/
+          cp f4hwn.game.packed.bin release-assets/
+        ) > build.log 2>&1
+
+    - name: Upload build log on failure
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: build-log-${{ env.VERSION }}
+        path: build.log
 
     - name: Package all assets
       run: |
