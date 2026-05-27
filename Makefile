@@ -601,7 +601,13 @@ bsp/dp32g030/%.h: hardware/dp32g030/%.def
 -include $(DEPS)
 
 clean:
-	$(RM) $(call FixPath, $(TARGET).bin $(TARGET).packed.bin $(TARGET) $(OBJS) $(DEPS))
+	$(RM) $(call FixPath, *.o *.d)
+	$(RM) $(call FixPath, driver/*.o driver/*.d)
+	$(RM) $(call FixPath, app/*.o app/*.d)
+	$(RM) $(call FixPath, ui/*.o ui/*.d)
+	$(RM) $(call FixPath, helper/*.o helper/*.d)
+	$(RM) $(call FixPath, external/printf/*.o external/printf/*.d)
+	$(RM) $(call FixPath, f4hwn.*.bin f4hwn.*.packed.bin f4hwn.custom f4hwn.standard f4hwn.bandscope f4hwn.broadcast f4hwn.basic f4hwn.rescueops f4hwn.game)
 
 doxygen:
 	doxygen
